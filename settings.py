@@ -1,8 +1,8 @@
 ######### global settings  #########
 GPU = True                                  # running on GPU is highly suggested
-TEST_MODE = False                           # turning on the testmode means the code will run on a small dataset.
+TEST_MODE = True  # turning on the testmode means the code will run on a small dataset.
 CLEAN = True                               # set to "True" if you want to clean the temporary large files after generating result
-MODEL = 'resnet18'                          # model arch: resnet18, alexnet, resnet50, densenet161
+MODEL = 'densenet161'  # model arch: resnet18, alexnet, resnet50, densenet161
 DATASET = 'places365'                       # model trained on: places365 or imagenet
 QUANTILE = 0.005                            # the threshold used for activation
 SEG_THRESHOLD = 0.04                        # the threshold used for visualization
@@ -36,6 +36,7 @@ if DATASET == 'places365':
     NUM_CLASSES = 365
 elif DATASET == 'imagenet':
     NUM_CLASSES = 1000
+
 if MODEL == 'resnet18':
     FEATURE_NAMES = ['layer4']
     if DATASET == 'places365':
@@ -48,18 +49,30 @@ elif MODEL == 'densenet161':
     FEATURE_NAMES = ['features']
     if DATASET == 'places365':
         MODEL_FILE = 'zoo/whole_densenet161_places365_python36.pth.tar'
-        MODEL_PARALLEL = False
+        MODEL_PARALLEL = False  # default False
 elif MODEL == 'resnet50':
     FEATURE_NAMES = ['layer4']
     if DATASET == 'places365':
         MODEL_FILE = 'zoo/whole_resnet50_places365_python36.pth.tar'
-        MODEL_PARALLEL = False
+        MODEL_PARALLEL = True  # default False
 
+elif MODEL == 'alexnet':
+    FEATURE_NAMES = ['features']
+    if DATASET == 'places365':
+        MODEL_FILE = 'zoo/alexnet_places365.pth.tar'
+        MODEL_PARALLEL = True  # default False
+
+# on resnet18_places365
+# step 1: about 5min30
+# step 2: about 1min40
+# step 3: about 13min15
+# step 4: about 20sec
 if TEST_MODE:
-    WORKERS = 1
-    BATCH_SIZE = 4
-    TALLY_BATCH_SIZE = 2
-    TALLY_AHEAD = 1
+    WORKERS = 12  # default 1
+    BATCH_SIZE = 64 if MODEL == 'resnet18' or 'alexnet' else 16  # default 4. With 64 on resnet18, uses 3.5Go of the GPU. Same with resnet50, needs batch_size=16
+    # 64 on alexnet, 1.4Go of GPU
+    TALLY_BATCH_SIZE = 16  # default 2
+    TALLY_AHEAD = 4  #default 1
     INDEX_FILE = 'index_sm.csv'
     OUTPUT_FOLDER += "_test"
 else:
