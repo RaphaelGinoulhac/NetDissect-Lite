@@ -513,8 +513,8 @@ class SegmentationPrefetcher:
         '''Iterator for all batches'''
         while True:
             batch = self.fetch_batch()
-            if batch is None:
-                raise StopIteration
+            # if batch is None:
+            #    raise StopIteration
             yield batch
 
     def fetch_batch(self):
@@ -540,8 +540,8 @@ class SegmentationPrefetcher:
         while True:
             batch = self.fetch_tensor_batch(
                     bgr_mean=bgr_mean, global_labels=global_labels)
-            if batch is None:
-                raise StopIteration
+            # if batch is None:
+            #    raise StopIteration
             yield batch
 
     def form_caffe_tensors(self, batch, bgr_mean=None, global_labels=False):
